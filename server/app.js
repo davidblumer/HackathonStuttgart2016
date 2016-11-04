@@ -51,6 +51,9 @@ var map = {
     "width":100
 };
 
+/**
+ * User-creation
+ */
 io.on('user.session.connect', function (socket, data) {
     var newLocation = {
         x: 0,
@@ -67,10 +70,12 @@ io.on('user.session.connect', function (socket, data) {
     clients.push(user);
 
     socket.emit('map.layout', map);
+
+    io.emit('user.session.joined', user);
 });
 
 /**
- * User-Movement
+ * User-movement
  */
 io.on('user.movement', function (socket, data) {
     var user = _.find(clients, ['id', userId]);
