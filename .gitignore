@@ -1,0 +1,5 @@
+.idea/
+.idea/*
+frontend/assets/css/*
+frontend/bower_components/
+server/node_modules/
