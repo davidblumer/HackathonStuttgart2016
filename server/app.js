@@ -16,6 +16,9 @@ var clients = [];
 var colors =  ['green', 'blue', 'red', 'yellow', 'beige'];
 var map = [];
 
+/**
+ * User-creation
+ */
 io.on('user.session.connect', function (socket, data) {
     var newLocation = {
         x: 0,
@@ -29,12 +32,14 @@ io.on('user.session.connect', function (socket, data) {
         location: newLocation,
         color: colors[clients.length]
     };
-    
+
     clients.push(user);
+
+    io.emit('user.session.joined', user);
 });
 
 /**
- * User-Movement
+ * User-movement
  */
 io.on('user.movement', function (socket, data) {
     var user = _.find(clients, ['id', userId]);
