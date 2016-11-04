@@ -66,7 +66,7 @@ io.on('user.session.connect', function (socket, data) {
 
     clients.push(user);
 
-    io.emit('map.layout', map);
+    socket.emit('map.layout', map);
 });
 
 /**
