@@ -1,0 +1,29 @@
+{
+  "name": "HackathonStuttgart2016Frontend",
+  "homepage": "https://github.com/SocialbitGmbH/HackathonStuttgart2016",
+  "authors": [
+    "David Blumer <david.blumer@socialbit.de>",
+    "Joshua Schumacher <joshua.schumacher@socialbit.de>",
+    "Thomas Kekeisen <thomas.kekeisen@socialbit.de>",
+  ],
+  "description": "",
+  "main": "index.html",
+  "keywords": [
+    "hackathon",
+    "kaercher",
+    "phaser",
+    "game"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "phaser": "^2.6.2"
+  }
+}
