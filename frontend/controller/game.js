@@ -4,6 +4,11 @@
  * @see https://github.com/SocialbitGmbH/HackathonStuttgart2016/tree/develop
  */
 
+var game      = {
+    layer:  null,
+    phaser: null,
+    map:    null
+};
 var logPrefix = 'HACKSTGT16: ';
 
 /**
@@ -11,10 +16,17 @@ var logPrefix = 'HACKSTGT16: ';
  */
 function gameCreate()
 {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.phaser.physics.startSystem(Phaser.Physics.ARCADE);
 
-    game.stage.backgroundColor = '#CCCCCC';
+    game.phaser.stage.backgroundColor = '#CCCCCC';
 
+    game.map = game.phaser.add.tilemap('map');
+
+    game.map.addTilesetImage('Map', 'mapTiles');
+
+    game.layer = game.map.createLayer('Tile Layer 1');
+
+    game.layer.resizeWorld();
 }
 
 /**
@@ -22,7 +34,9 @@ function gameCreate()
 */
 function gamePreload()
 {
-    // TODO
+    game.phaser.load.tilemap('map', 'data/map.json', null, Phaser.Tilemap.TILED_JSON);
+
+    game.phaser.load.image('mapTiles', 'assets/images/tilemaps/map.png');
 
 }
 
@@ -109,7 +123,7 @@ socket.on('error', function()
 
 
 
-var game = new Phaser.Game(
+game.phaser = new Phaser.Game(
     window.innerWidth,
     window.innerHeight,
     Phaser.CANVAS,
