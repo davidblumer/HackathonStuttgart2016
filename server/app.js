@@ -32,21 +32,23 @@ var cache = {collision: [], walkable: []};
 
 function isMovementAllowed(location) {
 
-    if (_.includes(cache.collision, location)) {
-        return false;
-    }
-    else if (_.includes(cache.walkable, location)) {
-        return true
-    }
-    for (var i = 0; i < map.layers.length; i++) {
-        if (_.includes(allowedTerrain, map.layers[i].data[newDestination])) {
-            cache.walkable.push(newDestination);
-            return true;
-        } else {
-            cache.collision.push(newDestination);
-            return false;
-        }
-    }
+    console.log(map);
+    // if (_.includes(cache.collision, location)) {
+    //     return false;
+    // }
+    // else if (_.includes(cache.walkable, location)) {
+    //     return true
+    // }
+    // for (var i = 0; i < map.layers.length; i++) {
+    //     if (_.includes(allowedTerrain, map.layers[i].data[newDestination])) {
+    //         cache.walkable.push(newDestination);
+    //         return true;
+    //     } else {
+    //         cache.collision.push(newDestination);
+    //         return false;
+    //     }
+    // }
+    return true
 }
 
 function generateLocation() {
@@ -55,8 +57,8 @@ function generateLocation() {
     //     y: Math.round(Math.random() * (map.tilesets[0].imageheight - 0) + 0)
     // };
     return {
-        x: 0,
-        y: 0
+        x: 50,
+        y: 50
     };
 }
 
@@ -122,23 +124,23 @@ io.on('connection', function (socket) {
             }
             if (data.right) {
                 //   console.log('Movement detected: ', socket.id, ' ◄');
-                --newLocation.x;
+                ++newLocation.x;
                 user.direction = 'right';
             }
             if (data.up) {
                 //  console.log('Movement detected: ', socket.id, ' ▲');
-                --newLocation.x;
+                --newLocation.y;
                 user.direction = 'up';
             }
             if (data.down) {
                 //   console.log('Movement detected: ', socket.id, ' ▼');
-                --newLocation.x;
+                ++newLocation.y;
                 user.direction = 'down';
             }
 
-            if(isMovementAllowed(newLocation)) {
+            // if(isMovementAllowed(newLocation)) {
                 user.location = newLocation;
-            }
+            // }
             user.lastMovement = now;
             io.emit('user.location.change', socket.id, user);
         }
