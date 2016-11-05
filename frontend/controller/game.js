@@ -4,6 +4,7 @@
  * @see https://github.com/SocialbitGmbH/HackathonStuttgart2016/tree/develop
  */
 
+
 var directions = {
     down:  'down',
     left:  'left',
@@ -11,6 +12,8 @@ var directions = {
     up:    'up'
 };
 var game = null;
+
+var actionFunction = null;
 
 var presentationTimer = {
     lastAction: null,
@@ -24,13 +27,9 @@ var logPrefix = 'HACKSTGT16: ';
 var socketCommands = {
     chatMessage:        'chat.message',
     collisionList:      'collision.list',
-    questShowKaercher1: 'quest.show.kaercher1',
-    questShowKaercher2: 'quest.show.kaercher2',
-    questShowKaercher3: 'quest.show.kaercher3',
-    questCar2go1:       'quest.show.car2go1',
-    questCar2go2:       'quest.show.car2go2',
-    questCar2go3:       'quest.show.car2go3',
-    questCar2go4:       'quest.show.car2go4',
+    questShowText:      'quest.show.text',
+    questShowKaercher:  'quest.show.kaercher',
+    questCar2go:        'quest.show.car2go',
     mapLayout:          'map.layout',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
@@ -129,6 +128,7 @@ function gameInitKeys ()
 {
     game.keys.c     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.C);
     game.keys.t     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.T);
+    game.keys.space = game.phaser.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     game.keys.shift = game.phaser.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
     game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
@@ -263,7 +263,7 @@ function gameRender()
 
 
     return;
-    
+
     var rect = new Phaser.Rectangle(0, 0, 16, 16);
     // console.log(rect);
     game.phaser.debug.geom( rect, '#0000ff' ) ;
@@ -319,6 +319,17 @@ function gameUpdate()
     if (game.keys.t.isDown)
     {
         toggleTimer();
+    }
+
+    if (game.keys.space.isDown)
+    {
+        console.log('action function', actionFunction);
+
+        if (actionFunction)
+        {
+            actionFunction();
+            actionFunction = null;
+        }
     }
 }
 
@@ -529,42 +540,34 @@ game.socket.on('connect', function ()
         collisionDebug = data;
     });
 
-    game.socket.on(socketCommands.questShowKaercher1, function(user)
+    game.socket.on(socketCommands.questShowText, function(data)
     {
-        showKaercherWasserspender1();
+        console.log(socketCommands.questShowText, data);
+
+        if (data.data == 1) actionFunction = showTechStack;
     });
 
-    game.socket.on(socketCommands.questShowKaercher2, function(user)
+    game.socket.on(socketCommands.questShowKaercher, function(data)
     {
-        showKaercherWasserspender2();
-    });
+        console.log(socketCommands.questShowKaercher, data);
 
-    game.socket.on(socketCommands.questShowKaercher3, function(user)
-    {
-        showKaercherWasserspender3();
-    });
-
-    game.socket.on(socketCommands.questCar2go1, function(user)
-    {
-        showCar2GoCar1();
-    });
-
-    game.socket.on(socketCommands.questCar2go2, function(user)
-    {
-        showCar2GoCar2();
-    });
-
-    game.socket.on(socketCommands.questCar2go3, function(user)
-    {
-        showCar2GoCar3();
-    });
-
-    game.socket.on(socketCommands.questCar2go4, function(user)
-    {
-        showCar2GoCar4();
+        if      (data.data == 1) actionFunction = showKaercherWasserspender1;
+        else if (data.data == 2) actionFunction = showKaercherWasserspender2;
+        else if (data.data == 3) actionFunction = showKaercherWasserspender3;
     });
 
 
+
+
+    game.socket.on(socketCommands.questCar2go, function(data)
+    {
+        console.log(socketCommands.questCar2go, data);
+
+        if      (data.data == 1) actionFunction = showCar2GoCar1;
+        else if (data.data == 2) actionFunction = showCar2GoCar2;
+        else if (data.data == 3) actionFunction = showCar2GoCar3;
+        else if (data.data == 4) actionFunction = showCar2GoCar4;
+    });
 
 
     game.socket.on(socketCommands.userLeft, function(user)

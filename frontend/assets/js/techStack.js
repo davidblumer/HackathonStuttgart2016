@@ -1,5 +1,8 @@
 function showTechStack ()
 {
+    var starSound    = $('#starSound')[0];
+    starSound.play();
+
     var string = ['<table>'];
 
 

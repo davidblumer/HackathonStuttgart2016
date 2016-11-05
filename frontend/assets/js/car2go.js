@@ -19,7 +19,13 @@ function showCar2GoCar4()
 }
 
 function getCar2goData(url) {
+
+    var starSound    = $('#starSound')[0];
+    starSound.play();
+    $('#loading').fadeIn(50);
+
     $.get(url, function( data ) {
+        $('#loading').fadeOut(50);
 
         var string = '<table>';
 

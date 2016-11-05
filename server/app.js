@@ -54,6 +54,141 @@ var debug = false;
 var clients = [];
 var colors = ['green', 'blue', 'red', 'yellow', 'beige'];
 
+var quests = [
+    {
+        data:  1,
+        event: 'quest.show.car2go',
+        locations: [
+            {
+                x: 28,
+                y: 25
+            },
+            {
+                x: 29,
+                y: 25
+            },
+            {
+                x: 30,
+                y: 25
+            }
+        ],
+        user: null
+    },
+    {
+        data:  2,
+        event: 'quest.show.car2go',
+        locations: [
+            {
+                x: 28,
+                y: 27
+            },
+            {
+                x: 29,
+                y: 27
+            },
+            {
+                x: 30,
+                y: 27
+            }
+        ],
+        user: null
+    },
+    {
+        data:  3,
+        event: 'quest.show.car2go',
+        locations: [
+            {
+                x: 28,
+                y: 29
+            },
+            {
+                x: 29,
+                y: 29
+            },
+            {
+                x: 30,
+                y: 29
+            }
+        ],
+        user: null
+    },
+    {
+        data:  4,
+        event: 'quest.show.car2go',
+        locations: [
+            {
+                x: 28,
+                y: 31
+            },
+            {
+                x: 29,
+                y: 31
+            },
+            {
+                x: 30,
+                y: 31
+            }
+        ],
+        user: null
+    },
+    {
+        data:  1,
+        event: 'quest.show.kaercher',
+        locations: [
+            {
+                x: 62,
+                y: 53
+            }
+        ],
+        user: null
+    },
+    {
+        data:  2,
+        event: 'quest.show.kaercher',
+        locations: [
+            {
+                x: 64,
+                y: 53
+            }
+        ],
+        user: null
+    },
+    {
+        data:  3,
+        event: 'quest.show.kaercher',
+        locations: [
+            {
+                x: 43,
+                y: 14
+            },
+            {
+                x: 44,
+                y: 14
+            },
+            {
+                x: 43,
+                y: 15
+            },
+            {
+                x: 44,
+                y: 15
+            }
+        ],
+        user: null
+    },
+    {
+        data:  1,
+        event: 'quest.show.text',
+        locations: [
+            {
+                x: 52,
+                y: 28
+            }
+        ],
+        user: null
+    }
+];
+
 /**
  * Map
  */
@@ -220,6 +355,79 @@ io.on('connection', function (socket) {
 
             if (isMovementAllowed(newLocation, user.direction)) {
                 user.location = newLocation;
+
+                var tile = {
+                    x: Math.floor(user.location.x / 16),
+                    y: Math.floor(user.location.y / 16)
+                };
+
+                var userIsInZone = false;
+
+                for (var questKey in quests)
+                {
+                    var currentQuest = quests[questKey];
+
+                    for (var locationKey in currentQuest.locations)
+                    {
+                        var currentQuestLocation = currentQuest.locations[locationKey];
+
+                        if (currentQuestLocation.x == tile.x && currentQuestLocation.y == tile.y)
+                        {
+                            console.log('GDSGSS', currentQuest);
+
+                            if (currentQuest.user == null)
+                            {
+                                userIsInZone = true;
+
+                                currentQuest.user = user;
+
+                                socket.emit(currentQuest.event, { data: currentQuest.data })
+                            }
+                        }
+
+
+                    }
+
+                }
+
+
+                if (!userIsInZone)
+                {
+                    for (var questKey in quests)
+                    {
+                        var currentQuest = quests[questKey];
+
+                        if (currentQuest.user == user)
+                        {
+                            currentQuest.user = null;
+                        }
+                    }
+                }
+
+                // TODO: user wieder von objekten entfernen
+
+
+                /*
+                 data:  1,
+                 event: 'quest.show.car2go',
+                 locations: [
+                 {
+                 x: 28,
+                 y: 25
+                 },
+                 {
+                 x: 29,
+                 y: 25
+                 },
+                 {
+                 x: 30,
+                 y: 25
+                 }
+                 ],
+                 user: null
+                 */
+
+
             }
             user.lastMovement = now;
             io.emit('user.location.change', socket.id, user);
