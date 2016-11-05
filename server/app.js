@@ -3,6 +3,50 @@ const _ = require('lodash');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+
+/*
+var Jimp = require("jimp");
+
+Jimp.read("../frontend/assets/images/tilemaps/map.png", function (err, sourceMap)
+{
+    var tileSize  = 16;
+    var spaceSize = 1;
+    var tilesX    = (sourceMap.bitmap.width + 1) / (tileSize + spaceSize);
+    var tilesY    = (sourceMap.bitmap.height + 1) / (tileSize + spaceSize);
+
+    console.log('Fixing image, tiles:', tilesX, tilesY);
+
+    var newSize = {
+        height: tileSize * tilesY,
+        width:  tileSize * tilesX
+    };
+
+    var targetImage = new Jimp(newSize.width, newSize.height, function (err, newImage)
+    {
+        for (var x = 0; x < tilesX; ++x)
+        {
+            for (var y = 0; y < tilesY; ++y)
+            {
+                newImage.blit(
+                    sourceMap,
+                    x * tileSize,
+                    y * tileSize,
+                    (x * (tileSize + spaceSize)),
+                    (y * (tileSize + spaceSize)),
+                    tileSize,
+                    tileSize);
+            }
+        }
+
+        newImage.write('../frontend/assets/images/tilemaps/mapNoSpace.png')
+    });
+});*/
+
+
+
+
+
+
 var server_port = process.env.PORT || 1338;
 
 // Header etc.

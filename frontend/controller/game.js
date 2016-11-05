@@ -82,16 +82,16 @@ function gameCreate()
 
     game.phaser.physics.startSystem(Phaser.Physics.ARCADE);
 
-    game.phaser.stage.backgroundColor = '#CCCCCC';
+    game.phaser.stage.backgroundColor = '#FF0000';
 
     game.map = game.phaser.add.tilemap('map');
 
-    game.map.addTilesetImage('Map', 'mapTiles');
+    game.map.addTilesetImage('Map', 'mapTiles', 16, 16, 1, 1);
 
 
 
 
-
+// function (tileset, key, tileWidth, tileHeight, tileMargin, tileSpacing, gid) {
 
 
 
@@ -222,7 +222,7 @@ function gamePreload()
     //game.phaser.load.tilemap('map', 'data/map.json', null, Phaser.Tilemap.TILED_JSON);
     game.phaser.load.tilemap('map', null, game.tileData, Phaser.Tilemap.TILED_JSON);
 
-    game.phaser.load.image('mapTiles', 'assets/images/tilemaps/map.png');
+    game.phaser.load.image('mapTiles', 'assets/images/tilemaps/mapNoSpace.png');
 
 
     game.phaser.load.spritesheet('players', 'assets/images/tilemaps/player.png', 16, 16, 81);
@@ -521,7 +521,7 @@ game.socket.on('connect', function ()
      */
     game.socket.on(socketCommands.chatMessage, function(user, message)
     {
-        // console.log(logPrefix + 'chat message', user, message);
+        console.log(logPrefix + 'chat message', user, message);
 
         var finalMessage = user.name + ': ' + message.text;
 
