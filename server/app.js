@@ -68,33 +68,14 @@ var colors = ['green', 'blue', 'red', 'yellow', 'beige'];
 // };
 
 var allowedTerrain = [707, 708, 709, 710, 711, 712, 889, 1164, 1952, 77, 76, 899, 715, 744, 745, 746, 747, 748, 749];
-var cache = {collision: [], walkable: []};
+var cache = {collision: []};
 
 function isMovementAllowed(location) {
 
     if (_.includes(cache.collision, location)) {
         return false;
     }
-    else if (_.includes(cache.walkable, location)) {
-        return true
-    }
-
-    _.forEach(map.layers, function (layer) {
-        var locationInArray = ((location.y - 1) * map.width) + location.x;
-        var activeTile = layer.data[Math.round(locationInArray / 16)];
-
-        console.log(location);
-        if (activeTile > 0) {
-            console.log(activeTile);
-            if (_.includes(allowedTerrain, activeTile)) {
-                cache.walkable.push(location);
-                return true
-            } else {
-                cache.collision.push(location);
-                return false;
-            }
-        }
-    });
+    return true;
 }
 
 function generateLocation() {
