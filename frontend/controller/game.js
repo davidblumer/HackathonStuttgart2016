@@ -373,7 +373,8 @@ function getServerAddress (target)
 function getServerConnectionOptions ()
 {
     return {
-        'force new connection': true
+        'force new connection': false,
+        reconnection: false
     };
 }
 
