@@ -15,6 +15,13 @@ $(document).ready(function()
 
     intro.click(function()
     {
+        if (intro.hasClass('locked'))
+        {
+            return;
+        }
+
+        intro.addClass('locked');
+
         toggleTimer();
 
         victorySound.play();
@@ -31,8 +38,20 @@ $(document).ready(function()
 
                 window.setTimeout(function()
                 {
-                    intro.fadeOut(250);
-                }, 250);
+                    intro.addClass('hover');
+
+                    starSound.play();
+
+                    window.setTimeout(function()
+                    {
+                        intro.removeClass('hover');
+
+                        window.setTimeout(function()
+                        {
+                            intro.fadeOut(250);
+                        }, 250);
+                    }, 250);
+                }, 500);
             }, 250);
         }, 2000);
     });
