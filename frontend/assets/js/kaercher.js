@@ -17,7 +17,7 @@ function getKaercherData (url)
 {
     $.get(url, function( data ) {
 
-        var string = [];
+        var string = ['<table>'];
 
         var dataPoints = $(data).find('datapoints');
 
@@ -32,7 +32,7 @@ function getKaercherData (url)
 
             if (readableName)
             {
-                finalText = readableName + ': ' + value;
+                finalText = '<tr><td>' + readableName + '</td><td>' + value + '</td>';
 
                 string.push(finalText);
             }
@@ -41,7 +41,9 @@ function getKaercherData (url)
 
         });
 
-        showQuest(string.join('<br />'), 'kaercher');
+        string.push('</table>');
+
+        showQuest(string.join(''), 'kaercher');
 
     });
 }
