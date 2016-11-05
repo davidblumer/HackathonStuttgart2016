@@ -86,7 +86,7 @@ function gameCreate()
 
     game.map = game.phaser.add.tilemap('map');
 
-    game.map.addTilesetImage('Map', 'mapTiles', 16, 16, 1, 1);
+    game.map.addTilesetImage('mapNoSpace', 'mapTiles', 16, 16, 1, 1);
 
 
 
