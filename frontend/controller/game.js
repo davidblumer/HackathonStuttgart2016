@@ -15,6 +15,7 @@ var game = null;
 var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
+    mapLayout:          'map.layout',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
     userJoined:         'user.session.joined',
@@ -29,6 +30,10 @@ var socketCommands = {
  */
 function gameCreate()
 {
+    console.log(logPrefix + 'gameCreate');
+
+    reset();
+
     game.phaser.physics.startSystem(Phaser.Physics.ARCADE);
 
     game.phaser.stage.backgroundColor = '#CCCCCC';
@@ -50,6 +55,8 @@ function gameCreate()
 
     gameInitKeys();
     gameInitPlayers();
+
+    game.socket.emit('user.list');
 }
 
 function gameInitKeys ()
@@ -89,7 +96,10 @@ function gameInitPlayers ()
 */
 function gamePreload()
 {
-    game.phaser.load.tilemap('map', 'data/map.json', null, Phaser.Tilemap.TILED_JSON);
+    console.log(logPrefix + 'gamePreload');
+
+    //game.phaser.load.tilemap('map', 'data/map.json', null, Phaser.Tilemap.TILED_JSON);
+    game.phaser.load.tilemap('map', null, game.tileData, Phaser.Tilemap.TILED_JSON);
 
     game.phaser.load.image('mapTiles', 'assets/images/tilemaps/map.png');
 
@@ -105,6 +115,7 @@ function gamePreload()
  */
 function gameRender()
 {
+    // console.log(logPrefix + 'gameRender');
     // TODO
 }
 
@@ -188,10 +199,11 @@ function reset ()
             phaser:  null,
             player:  [],
             map:     null,
-            socket:  null
+            socket:  null,
+            tileData: null
         };
     }
-    else
+    else if (game.player && game.player.length == 4)
     {
         for (var i = 0; i < 4; ++i)
         {
@@ -213,7 +225,7 @@ localStorage.debug = '*gds';
 
 reset();
 
-game.socket = io.connect(getServerAddress('david'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('davidfsa'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
@@ -225,7 +237,17 @@ game.socket.on('connect', function ()
         name: 'TT'
     };
 
-        game.socket.emit(socketCommands.userConnect, userData);
+    game.socket.emit(socketCommands.userConnect, userData);
+
+
+    game.socket.on(socketCommands.mapLayout, function(mapLayout)
+    {
+        var mapLayoutString = JSON.stringify(mapLayout);
+
+        console.log(logPrefix + 'map layout data', mapLayout, mapLayoutString);
+
+        game.tileData = mapLayoutString;
+    });
 
 
     game.socket.on(socketCommands.userLocationChange, function(user)
@@ -281,7 +303,7 @@ game.socket.on('connect', function ()
         {
             var currentPlayer = game.player[i];
 
-            if (currentPlayer.socketId == null)
+            if (currentPlayer && currentPlayer.socketId == null)
             {
                 currentPlayer.socketId       = user.id;
                 currentPlayer.sprite.visible = true;
@@ -306,7 +328,7 @@ game.socket.on('connect', function ()
             {
                 var localUser = game.player[i];
 
-                if (localUser.socketId == serverUser.id || selfUserId == serverUser.id)
+                if ((localUser && localUser.socketId == serverUser.id) || selfUserId == serverUser.id)
                 {
                     serverUserFound = true;
                 }
@@ -318,7 +340,7 @@ game.socket.on('connect', function ()
                 {
                     var localUser = game.player[i];
 
-                    if (localUser.socketId == null)
+                    if (localUser  && localUser.socketId == null)
                     {
                         console.log('Tesfast', serverUser, localUser);
 
@@ -331,7 +353,6 @@ game.socket.on('connect', function ()
                     }
                 }
             }
-
         }
     });
 });
@@ -353,17 +374,32 @@ game.socket.on('error', function()
 
 
 
-game.phaser = new Phaser.Game(
-    window.innerWidth,
-    window.innerHeight,
-    Phaser.CANVAS,
-    'hackathonStuttgart',
+function waitForMapData ()
+{
+    if (game.tileData)
     {
-        preload: gamePreload,
-        create:  gameCreate,
-        update:  gameUpdate,
-        render:  gameRender
+        game.phaser = new Phaser.Game(
+            window.innerWidth,
+            window.innerHeight,
+            Phaser.CANVAS,
+            'hackathonStuttgart',
+            {
+                preload: gamePreload,
+                create:  gameCreate,
+                update:  gameUpdate,
+                render:  gameRender
+            }
+        );
+
     }
-);
+    else
+    {
+        window.setTimeout(waitForMapData, 250);
+    }
+
+}
 
 
+
+
+waitForMapData();
