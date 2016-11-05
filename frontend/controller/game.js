@@ -176,7 +176,7 @@ function getPlayerNameFromUser ()
     return name;
 }
 
-function gameMovePlayerTo (player, x, y, direction)
+function gameMovePlayerTo (player, x, y, direction, followCamera)
 {
     console.log(logPrefix + 'gameMovePlayerTo', player, x, y);
 
@@ -198,6 +198,11 @@ function gameMovePlayerTo (player, x, y, direction)
     if (animationName)
     {
         player.sprite.animations.play(animationName);
+    }
+
+    if (followCamera)
+    {
+        game.phaser.camera.follow(player.sprite);
     }
 }
 
@@ -371,7 +376,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('david'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('david__'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
@@ -397,7 +402,7 @@ game.socket.on('connect', function ()
     });
 
 
-    game.socket.on(socketCommands.userLocationChange, function(user)
+    game.socket.on(socketCommands.userLocationChange, function(selfUserId, user)
     {
         var currentPlayer = getUserForSocketUser(user);
 
@@ -405,7 +410,7 @@ game.socket.on('connect', function ()
 
         if (currentPlayer)
         {
-            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction);
+            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction, selfUserId == user.id);
         }
         else
         {

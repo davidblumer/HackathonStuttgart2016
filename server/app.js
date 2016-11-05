@@ -250,7 +250,7 @@ io.on('connection', function (socket) {
             }
 
             user.lastMovement = now;
-            io.emit('user.location.change', user);
+            io.emit('user.location.change', socket.id, user);
         }
     });
     socket.on('disconnect', function () {
