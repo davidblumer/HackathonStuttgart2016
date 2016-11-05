@@ -283,12 +283,16 @@ function reset ()
             },
             layer:
             {
-                additions: null,
-                ground: null,
-                road: null,
+                // Beware: order is important here!
                 sea: null,
+                ground: null,
+                ground1: null,
                 train: null,
-                trees: null
+                trees: null,
+                road: null,
+                additions: null,
+                house: null,
+                extras: null
             },
             lastMovementSent: null,
             phaser:  null,
@@ -317,7 +321,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('davidfsa'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('david'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
