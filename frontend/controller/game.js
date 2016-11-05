@@ -12,9 +12,15 @@ var directions = {
 };
 var game = null;
 
+var presentationTimer = {
+    lastAction: null,
+    timer:      null
+};
+
 var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
+    chatMessage:        'chat.message',
     mapLayout:          'map.layout',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
@@ -25,14 +31,24 @@ var socketCommands = {
     userMovement:       'user.movement'
 };
 
+/**
+ * @param string
+ * @returns {string}
+ */
 function capitalize(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+/**
+ * @param user
+ * @param x
+ * @param y
+ * @param id
+ */
 function gameAddPlayer (user, x, y, id)
 {
-    console.log(logPrefix + 'gameAddPlayer', user, x, y, id);
+    // console.log(logPrefix + 'gameAddPlayer', user, x, y, id);
 
     if (id)
     {
@@ -44,9 +60,13 @@ function gameAddPlayer (user, x, y, id)
     user.sprite.y       = y;
 }
 
+/**
+ * @param user
+ * @param socketUser
+ */
 function gameAddPlayerFromSocketUser (user, socketUser)
 {
-    console.log(logPrefix + 'gameAddPlayerFromSocketUser', user, socketUser);
+    // console.log(logPrefix + 'gameAddPlayerFromSocketUser', user, socketUser);
 
     gameAddPlayer(user, socketUser.location.x, socketUser.location.y, socketUser.id);
 }
@@ -97,6 +117,8 @@ function gameCreate()
 
 function gameInitKeys ()
 {
+    game.keys.c     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.C);
+    game.keys.t     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.T);
     game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -160,7 +182,7 @@ function getPlayerNameFromUser ()
     return name;
 }
 
-function gameMovePlayerTo (player, x, y, direction)
+function gameMovePlayerTo (player, x, y, direction, followCamera)
 {
     console.log(logPrefix + 'gameMovePlayerTo', player, x, y);
 
@@ -182,6 +204,11 @@ function gameMovePlayerTo (player, x, y, direction)
     if (animationName)
     {
         player.sprite.animations.play(animationName);
+    }
+
+    if (followCamera)
+    {
+        game.phaser.camera.follow(player.sprite);
     }
 }
 
@@ -235,7 +262,7 @@ function gameUpdate()
 
     if (movementData.down || movementData.left || movementData.right || movementData.up)
     {
-        var currentTime = (new Date()).getTime();
+        var currentTime = getCurrentTime();
 
         if (game.lastMovementSent == null || game.lastMovementSent + 25 < currentTime)
         {
@@ -243,6 +270,21 @@ function gameUpdate()
             game.socket.emit(socketCommands.userMovement, movementData);
         }
     }
+
+    if (game.keys.c.isDown)
+    {
+        sendChatMessage();
+    }
+
+    if (game.keys.t.isDown)
+    {
+        toggleTimer();
+    }
+}
+
+function getCurrentTime ()
+{
+    return (new Date()).getTime();
 }
 
 /**
@@ -294,6 +336,7 @@ function reset ()
     {
         game = {
             keys:    {
+                c:     null,
                 down:  null,
                 left:  null,
                 right: null,
@@ -330,6 +373,64 @@ function reset ()
 }
 
 
+function sendChatMessage ()
+{
+    var chatMessage = prompt('What do you want to say?');
+
+    if (chatMessage)
+    {
+        game.socket.emit(socketCommands.chatMessage, { text: chatMessage });
+    }
+
+}
+
+function toggleTimer ()
+{
+    console.log(logPrefix + 'toggleTimer');
+
+    var currentTime = getCurrentTime();
+
+    if (presentationTimer.lastAction == null || presentationTimer.lastAction + 1337 < currentTime)
+    {
+        presentationTimer.lastAction = currentTime;
+
+        if (presentationTimer.timeout == null)
+        {
+            presentationTimer.timeout = 60 * 3;
+
+            $('#timer').show();
+
+        }
+        else
+        {
+            presentationTimer.timeout = null;
+        }
+
+        updateTimer();
+    }
+}
+
+function updateTimer ()
+{
+    --presentationTimer.timeout;
+
+
+    var minutes = Math.floor(presentationTimer.timeout / 60);
+    var seconds = presentationTimer.timeout - (minutes * 60);
+
+    $('#timer').text('Presentation time left: ' + minutes + ':' + seconds);
+
+    if (presentationTimer.timeout != null && presentationTimer.timeout > 0)
+    {
+        window.setTimeout(updateTimer, 1000);
+    }
+    else
+    {
+        presentationTimer.timeout = null;
+
+        $('#timer').hide();
+    }
+}
 
 
 localStorage.debug = '*fsaf';
@@ -365,7 +466,7 @@ game.socket.on('connect', function ()
     });
 
 
-    game.socket.on(socketCommands.userLocationChange, function(user)
+    game.socket.on(socketCommands.userLocationChange, function(selfUserId, user)
     {
         var currentPlayer = getUserForSocketUser(user);
 
@@ -373,7 +474,7 @@ game.socket.on('connect', function ()
 
         if (currentPlayer)
         {
-            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction);
+            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction, selfUserId == user.id);
         }
         else
         {
@@ -413,6 +514,23 @@ game.socket.on('connect', function ()
                 break;
             }
         }
+    });
+
+    /**
+     *
+     */
+    game.socket.on(socketCommands.chatMessage, function(user, message)
+    {
+        // console.log(logPrefix + 'chat message', user, message);
+
+        var finalMessage = user.name + ': ' + message.text;
+
+        var options = {
+            content: finalMessage,
+            timeout: 1337 * 2
+        };
+
+        $.snackbar(options);
     });
 
     game.socket.on(socketCommands.userList, function (selfUserId, serverUsers)
