@@ -4,6 +4,12 @@
  * @see https://github.com/SocialbitGmbH/HackathonStuttgart2016/tree/develop
  */
 
+var directions = {
+    down:  'down',
+    left:  'left',
+    right: 'right',
+    up:    'up'
+};
 var game     = {
     keys:    {
         down:  null,
@@ -14,7 +20,7 @@ var game     = {
     layer:   null,
     lastMovementSent: null,
     phaser:  null,
-    player:  null,
+    player:  [],
     map:     null,
     socket:  null
 };
@@ -23,6 +29,7 @@ var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
     userConnect:        'user.session.connect',
+    userJoined:         'user.session.joined',
     userLocationChange: 'user.location.change',
     userMovement:       'user.movement'
 };
@@ -45,17 +52,44 @@ function gameCreate()
     game.layer.resizeWorld();
 
 
-    game.player = game.phaser.add.tileSprite(0, 0, 16, 16, 'players');
-
-    game.player.animations.add('test', [0, 4]);
-
-    game.player.animations.play('test', 8, true);
 
 
-    game.keys.up = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
-    game.keys.down = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
-    game.keys.left = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+
+
+
+
+    gameInitKeys();
+    gameInitPlayers();
+}
+
+function gameInitKeys ()
+{
+    game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
+    game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+    game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     game.keys.right = game.phaser.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+}
+
+function gameInitPlayers ()
+{
+    for (var i = 0; i < 4; ++i)
+    {
+        var spriteIndex = i * 8;
+
+        var playerSprite = game.phaser.add.tileSprite(0, 0, 16, 16, 'players');
+        playerSprite.animations.add('moveDown',  [spriteIndex + 0, spriteIndex + 4]);
+        playerSprite.animations.add('moveLeft',  [spriteIndex + 3, spriteIndex + 7]);
+        playerSprite.animations.add('moveRight', [spriteIndex + 2, spriteIndex + 6]);
+        playerSprite.animations.add('moveUp',    [spriteIndex + 1, spriteIndex + 5]);
+        playerSprite.visible = false;
+
+        var newPlayer = {
+            socketId: null,
+            sprite:   playerSprite
+        };
+
+        game.player.push(newPlayer);
+    }
 }
 
 /**
@@ -107,26 +141,6 @@ function gameUpdate()
             game.socket.emit(socketCommands.userMovement, movementData);
         }
     }
-
-
-
-    if (game.keys.up.isDown)
-    {
-        //game.player.y--;
-    }
-    else if (game.keys.down.isDown)
-    {
-        //game.player.y++;
-    }
-
-    if (game.keys.left.isDown)
-    {
-        //game.player.x--;
-    }
-    else if (game.keys.right.isDown)
-    {
-        //game.player.x++;
-    }
 }
 
 /**
@@ -177,13 +191,65 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.userLocationChange, function(user)
     {
-       // console.log('Testes', user.location.x);
+
+        for (var i = 0; i < 4; ++i)
+        {
+            var currentPlayer = game.player[i];
+
+            if (currentPlayer.socketId == user.id)
+            {
+
+                currentPlayer.sprite.x = user.location.x;
+                currentPlayer.sprite.y = user.location.y;
 
 
-        game.player.x = user.location.x;
-        game.player.y = user.location.y;
+
+                var animationName = null;
+
+                switch (user.direction)
+                {
+                    case directions.down:  animationName = 'moveDown';  break;
+                    case directions.left:  animationName = 'moveLeft';  break;
+                    case directions.right: animationName = 'moveRight'; break;
+                    case directions.up:    animationName = 'moveUp';    break;
+                }
+
+                currentPlayer.sprite.animations.stop();
+
+                if (animationName)
+                {
+                    currentPlayer.sprite.animations.play(animationName);
+                }
+
+
+                break;
+            }
+        }
+
+
+
+
+
+
 
     });
+
+    game.socket.on(socketCommands.userJoined, function(user)
+    {
+        for (var i = 0; i < 4; ++i)
+        {
+            var currentPlayer = game.player[i];
+
+            if (currentPlayer.socketId == null)
+            {
+                currentPlayer.socketId       = user.id;
+                currentPlayer.sprite.visible = true;
+
+                break;
+            }
+        }
+    });
+
 
 
 
