@@ -513,11 +513,11 @@ game.socket.on('connect', function ()
 
 
 
-    var userData = {
+    game.userData = {
         name: getPlayerNameFromUser()
     };
 
-    game.socket.emit(socketCommands.userConnect, userData);
+    game.socket.emit(socketCommands.userConnect, game.userData);
 
 
     game.socket.on(socketCommands.mapLayout, function(mapLayout)
@@ -538,7 +538,7 @@ game.socket.on('connect', function ()
 
         if (currentPlayer)
         {
-            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction, selfUserId == user.id);
+            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction, selfUserId == user.id && game.userData.name == user.name);
         }
         else
         {
