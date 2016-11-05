@@ -170,7 +170,10 @@ function isMovementAllowed(location, direction) {
 }
 
 function generateLocation() {
-    return {x: Math.round(Math.random() * (map.width - 0) + 0), y: Math.round(Math.random() * (map.height - 0) + 0)};
+    return {
+        x: Math.round(Math.random() * (map.tilesets[0].imagewidth - 0) + 0),
+        y: Math.round(Math.random() * (map.tilesets[0].imageheight - 0) + 0)
+    };
 }
 
 io.on('connection', function (socket) {
