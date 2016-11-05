@@ -25,6 +25,11 @@ var socketCommands = {
     userMovement:       'user.movement'
 };
 
+function capitalize(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 /**
  *
  */
@@ -42,9 +47,6 @@ function gameCreate()
 
     game.map.addTilesetImage('Map', 'mapTiles');
 
-    game.layer = game.map.createLayer('Tile Layer 1');
-
-    game.layer.resizeWorld();
 
 
 
@@ -53,10 +55,23 @@ function gameCreate()
 
 
 
+
+
+
+
+
+
+
+
+
+    gameInitLayers();
     gameInitKeys();
     gameInitPlayers();
 
+
     game.socket.emit('user.list');
+
+
 }
 
 function gameInitKeys ()
@@ -65,6 +80,21 @@ function gameInitKeys ()
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     game.keys.right = game.phaser.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+}
+
+function gameInitLayers ()
+{
+    for (var key in game.layer)
+    {
+        var currentLayer = game.layer[key];
+
+        if (!currentLayer)
+        {
+            currentLayer = game.map.createLayer(capitalize(key));
+
+            currentLayer.resizeWorld();
+        }
+    }
 }
 
 function gameInitPlayers ()
@@ -174,6 +204,8 @@ function getUserForSocketUser (socketUser)
     {
         var currentPlayer = game.player[i];
 
+        console.log(logPrefix + 'getUserForSocketUser', currentPlayer.socketId, socketUser.id);
+
         if (currentPlayer.socketId == socketUser.id)
         {
             return currentPlayer;
@@ -194,7 +226,15 @@ function reset ()
                 right: null,
                 up:    null
             },
-            layer:   null,
+            layer:
+            {
+                additions: null,
+                ground: null,
+                road: null,
+                sea: null,
+                train: null,
+                trees: null
+            },
             lastMovementSent: null,
             phaser:  null,
             player:  [],
@@ -218,7 +258,7 @@ function reset ()
 
 
 
-localStorage.debug = '*gds';
+localStorage.debug = '*fsaf';
 
 
 
@@ -244,7 +284,7 @@ game.socket.on('connect', function ()
     {
         var mapLayoutString = JSON.stringify(mapLayout);
 
-        console.log(logPrefix + 'map layout data', mapLayout, mapLayoutString);
+        // console.log(logPrefix + 'map layout data', mapLayout, mapLayoutString);
 
         game.tileData = mapLayoutString;
     });
@@ -253,6 +293,8 @@ game.socket.on('connect', function ()
     game.socket.on(socketCommands.userLocationChange, function(user)
     {
         var currentPlayer = getUserForSocketUser(user);
+
+        console.log(logPrefix + 'userLocationChange', user, currentPlayer);
 
         if (currentPlayer)
         {
@@ -331,15 +373,23 @@ game.socket.on('connect', function ()
                 if ((localUser && localUser.socketId == serverUser.id) || selfUserId == serverUser.id)
                 {
                     serverUserFound = true;
+
+                    if (localUser)
+                    {
+                        localUser.socketId       = serverUser.id;
+                        localUser.sprite.visible = true;
+                        localUser.sprite.x       = serverUser.location.x;
+                        localUser.sprite.y       = serverUser.location.y;
+                    }
                 }
             }
-
+console.log(serverUserFound);
             if (!serverUserFound)
             {
                 for (var i = 0; i < 4; ++i)
                 {
                     var localUser = game.player[i];
-
+                    console.log('test aa a', localUser, localUser.socketId == null);
                     if (localUser  && localUser.socketId == null)
                     {
                         console.log('Tesfast', serverUser, localUser);

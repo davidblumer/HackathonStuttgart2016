@@ -155,6 +155,14 @@ io.on('connection', function (socket) {
     });
 
     /**
+     * User-creation
+     */
+    socket.on('user.list', function (data) {
+
+        socket.emit('user.list', socket.id, clients);
+    });
+
+    /**
      * User-movement
      */
     socket.on('user.movement', function (data) {
