@@ -122,6 +122,7 @@ function gameInitKeys ()
 {
     game.keys.c     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.C);
     game.keys.t     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.T);
+    game.keys.shift = game.phaser.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
     game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -136,7 +137,11 @@ function gameInitLayers ()
 
         if (!currentLayer)
         {
-            currentLayer = game.map.createLayer(capitalize(key));
+            var layerName = capitalize(key);
+
+            console.log(layerName);
+
+            currentLayer = game.map.createLayer(layerName);
 
             currentLayer.resizeWorld();
         }
@@ -260,6 +265,7 @@ function gameUpdate()
         down:  game.keys.down.isDown,
         left:  game.keys.left.isDown,
         right: game.keys.right.isDown,
+        shift: game.keys.shift.isDown,
         up:    game.keys.up.isDown
     };
 
@@ -348,15 +354,9 @@ function reset ()
             layer:
             {
                 // Beware: order is important here!
-                sea: null,
-                ground: null,
-                ground1: null,
-                train: null,
-                trees: null,
-                road: null,
-                additions: null,
-                house: null,
-                extras: null
+                layer1: null,
+                layer2: null,
+                layer3: null
             },
             lastMovementSent: null,
             phaser:  null,
