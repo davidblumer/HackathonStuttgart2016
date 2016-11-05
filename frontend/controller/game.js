@@ -10,20 +10,7 @@ var directions = {
     right: 'right',
     up:    'up'
 };
-var game     = {
-    keys:    {
-        down:  null,
-        left:  null,
-        right: null,
-        up:    null
-    },
-    layer:   null,
-    lastMovementSent: null,
-    phaser:  null,
-    player:  [],
-    map:     null,
-    socket:  null
-};
+var game = null;
 
 var logPrefix = 'HACKSTGT16: ';
 
@@ -85,6 +72,8 @@ function gameInitPlayers ()
         playerSprite.animations.add('moveRight', [spriteIndex + 2, spriteIndex + 6]);
         playerSprite.animations.add('moveUp',    [spriteIndex + 1, spriteIndex + 5]);
         playerSprite.visible = false;
+        playerSprite.animations.play('moveDown');
+        playerSprite.animations.stop();
 
         var newPlayer = {
             socketId: null,
@@ -183,6 +172,37 @@ function getUserForSocketUser (socketUser)
     return false;
 }
 
+function reset ()
+{
+    if (game == null)
+    {
+        game = {
+            keys:    {
+                down:  null,
+                left:  null,
+                right: null,
+                up:    null
+            },
+            layer:   null,
+            lastMovementSent: null,
+            phaser:  null,
+            player:  [],
+            map:     null,
+            socket:  null
+        };
+    }
+    else
+    {
+        for (var i = 0; i < 4; ++i)
+        {
+            var currentPlayer = game.player[i];
+
+            currentPlayer.socketId       = null;
+            currentPlayer.sprite.visible = false;
+        }
+    }
+}
+
 
 
 
@@ -191,6 +211,7 @@ localStorage.debug = '*gds';
 
 
 
+reset();
 
 game.socket = io.connect(getServerAddress('david'), getServerConnectionOptions());
 
@@ -285,7 +306,7 @@ game.socket.on('connect', function ()
             {
                 var localUser = game.player[i];
 
-                if (localUser.socketId == serverUser.id)
+                if (localUser.socketId == serverUser.id || selfUserId == serverUser.id)
                 {
                     serverUserFound = true;
                 }
@@ -319,8 +340,7 @@ game.socket.on('disconnect', function ()
 {
     console.log(logPrefix + 'socket disconnected');
 
-    // TODO alles resetten
-
+    reset();
 });
 
 game.socket.on('error', function()
