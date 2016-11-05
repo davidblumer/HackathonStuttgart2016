@@ -67,14 +67,59 @@ var colors = ['green', 'blue', 'red', 'yellow', 'beige'];
 //     rails: [1050, 1051, 1052, 1106, 1107, 1108]
 // };
 
-var allowedTerrain = [707, 708, 709, 710, 711, 712, 889, 1164, 1952, 77, 76, 899, 715, 744, 745, 746, 747, 748, 749];
-var cache = {collision: []};
+// NO WALLS: 908, 797, 901, 128, 682, 128
+var forbiddenTerrain = [888, 940, 939, 179, 593, 595, 585, 541, 646, 356, 242, 642, 598, 589, 946, 365];
+var cache = {forbiddenTiles: []};
 
-function isMovementAllowed(location) {
+function isMovementAllowed(location, direction) {
 
-    if (_.includes(cache.collision, location)) {
+    if (location.x < 0 || location.y < 0)
+    {
         return false;
     }
+
+
+
+
+    var tile = {
+        x: Math.floor(location.x / 16),
+        y: Math.floor(location.y / 16)
+    };
+
+
+    if (direction == 'right')
+    {
+        ++tile.x;
+    }
+
+    if (direction == 'down')
+    {
+        ++tile.y;
+    }
+
+    var locationString = tile.x + '_' + tile.y;
+
+
+
+    var isForbidden = cache.forbiddenTiles.indexOf(locationString) > -1;
+
+    console.log(location, tile, direction, locationString, isForbidden);
+
+    if (isForbidden) {
+        return false;
+    }
+
+
+
+    /*var x = Math.floor(location.x / 16) * 16;
+     var y = Math.floor(location.y / 16) * 16;
+
+
+
+     if (cache.raw.indexOf(locationString) > -1) {
+     console.log('hitler', x, y);
+     return false;
+     }*/
     return true;
 }
 
@@ -114,6 +159,11 @@ io.on('connection', function (socket) {
 
         socket.emit('user.list', socket.id, clients);
 
+        setTimeout(function ()
+        {
+            socket.emit('collision.list', cache.forbiddenTiles);
+        }, 1000);
+
         io.emit('user.session.joined', user);
     });
 
@@ -142,11 +192,11 @@ io.on('connection', function (socket) {
         var moveSpeed = 2 + (data.shift ? 4 : 0);
 
         var user = _.find(clients, ['id', socket.id]);
-        var newLocation = user.location;
+        var newLocation = { x: user.location.x, y: user.location.y };
 
         var now = Date.now();
 
-        if (user && now > user.lastMovement + 25 || user && !user.lastMovement) {
+        if (user && (now > user.lastMovement + 25 || !user.lastMovement)) {
             if (data.left) {
                 //  console.log('Movement detected: ', socket.id, ' ►');
                 newLocation.x -= moveSpeed;
@@ -168,7 +218,7 @@ io.on('connection', function (socket) {
                 user.direction = 'down';
             }
 
-            if (isMovementAllowed(newLocation)) {
+            if (isMovementAllowed(newLocation, user.direction)) {
                 user.location = newLocation;
             }
             user.lastMovement = now;
@@ -202,26 +252,42 @@ http.listen(server_port, function () {
 });
 
 function buildCache() {
-    var y = 0;
-    var mapWidth = map.tilesets[0].columns;
+    console.log('Building cache');
+
+    var mapWidthInTiles = map.width;
 
     _.forEach(map.layers, function (layer) {
         for (var i = 0; i < layer.data.length; i++) {
             var terrainId = layer.data[i];
-            if (terrainId > 0 && !_.includes(allowedTerrain, terrainId)) {
-                var index = cache.collision.indexOf(i);
-                if (index == -1) {
-                    var y = Math.floor(i / mapWidth);
-                    var x = i - (mapWidth * y);
-                    var location = {
-                        x: x,
-                        y: y
-                    };
-                    console.log(i, location, layer.data[i]);
-                    cache.collision.push(location);
+
+            var y = Math.floor(i / mapWidthInTiles);
+            var x = i - (mapWidthInTiles * y);
+            var locationString = x + '_' + y;
+            var isForbidden = terrainId > 0 && forbiddenTerrain.indexOf(terrainId) > -1;
+
+            console.log('Tile cache:', terrainId, locationString, isForbidden);
+
+
+            if (isForbidden) {
+
+
+                if (cache.forbiddenTiles.indexOf(locationString) == -1)
+                {
+
+
+                    cache.forbiddenTiles.push(locationString);
                 }
             }
+
+            //if (y > 0) return;
         }
     });
+
+
+
+    console.log('Building cache done, forbidden tiles', cache.forbiddenTiles.length, cache.forbiddenTiles[0], cache.forbiddenTiles[1]);
 }
+
 buildCache();
+
+console.log('Test', isMovementAllowed({ x: 55, y: 172 } ));

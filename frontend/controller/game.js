@@ -17,10 +17,13 @@ var presentationTimer = {
     timer:      null
 };
 
+var collisionDebug = null;
+
 var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
     chatMessage:        'chat.message',
+    collisionList:      'collision.list',
     questShowKaercher1: 'quest.show.kaercher1',
     questShowKaercher2: 'quest.show.kaercher2',
     questShowKaercher3: 'quest.show.kaercher3',
@@ -256,6 +259,26 @@ function gameRender()
 {
     // console.log(logPrefix + 'gameRender');
     // TODO
+
+    var rect = new Phaser.Rectangle(0, 0, 16, 16);
+    // console.log(rect);
+    game.phaser.debug.geom( rect, '#0000ff' ) ;
+
+    game.phaser.debug.text( "This is debug text", 10, 10 );
+
+    if (collisionDebug)
+    {
+        for (var i = 0; i < collisionDebug.length; ++i)
+        {
+            var entry = collisionDebug[i];
+            var splitted = entry.split('_');
+
+            var rect = new Phaser.Rectangle(parseInt(splitted[0], 10) * 16, parseInt(splitted[1], 10) * 16, 16, 16);
+           // console.log(rect);
+            game.phaser.debug.geom( rect, '#ff0000' ) ;
+
+        }
+    }
 }
 
 /**
@@ -493,6 +516,13 @@ game.socket.on('connect', function ()
     game.socket.on(socketCommands.userConnected, function(user)
     {
         // TODO??
+    });
+
+    game.socket.on(socketCommands.collisionList, function(data)
+    {
+        console.log('collision list', data);
+
+        collisionDebug = data;
     });
 
     game.socket.on(socketCommands.questShowKaercher1, function(user)
