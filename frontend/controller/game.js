@@ -12,6 +12,11 @@ var directions = {
 };
 var game = null;
 
+var presentationTimer = {
+    lastAction: null,
+    timer:      null
+};
+
 var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
@@ -113,6 +118,7 @@ function gameCreate()
 function gameInitKeys ()
 {
     game.keys.c     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.C);
+    game.keys.t     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.T);
     game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -256,7 +262,7 @@ function gameUpdate()
 
     if (movementData.down || movementData.left || movementData.right || movementData.up)
     {
-        var currentTime = (new Date()).getTime();
+        var currentTime = getCurrentTime();
 
         if (game.lastMovementSent == null || game.lastMovementSent + 25 < currentTime)
         {
@@ -269,6 +275,16 @@ function gameUpdate()
     {
         sendChatMessage();
     }
+
+    if (game.keys.t.isDown)
+    {
+        toggleTimer();
+    }
+}
+
+function getCurrentTime ()
+{
+    return (new Date()).getTime();
 }
 
 /**
@@ -366,6 +382,54 @@ function sendChatMessage ()
         game.socket.emit(socketCommands.chatMessage, { text: chatMessage });
     }
 
+}
+
+function toggleTimer ()
+{
+    console.log(logPrefix + 'toggleTimer');
+
+    var currentTime = getCurrentTime();
+
+    if (presentationTimer.lastAction == null || presentationTimer.lastAction + 1337 < currentTime)
+    {
+        presentationTimer.lastAction = currentTime;
+
+        if (presentationTimer.timeout == null)
+        {
+            presentationTimer.timeout = 60 * 3;
+
+            $('#timer').show();
+
+        }
+        else
+        {
+            presentationTimer.timeout = null;
+        }
+
+        updateTimer();
+    }
+}
+
+function updateTimer ()
+{
+    --presentationTimer.timeout;
+
+
+    var minutes = Math.floor(presentationTimer.timeout / 60);
+    var seconds = presentationTimer.timeout - (minutes * 60);
+
+    $('#timer').text('Presentation time left: ' + minutes + ':' + seconds);
+
+    if (presentationTimer.timeout != null && presentationTimer.timeout > 0)
+    {
+        window.setTimeout(updateTimer, 1000);
+    }
+    else
+    {
+        presentationTimer.timeout = null;
+
+        $('#timer').hide();
+    }
 }
 
 
