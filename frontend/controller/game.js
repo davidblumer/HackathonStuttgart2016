@@ -142,6 +142,24 @@ function gameInitPlayers ()
     }
 }
 
+function getPlayerNameFromUser ()
+{
+    var name = '';
+
+    if (localStorage.user)
+    {
+        name = localStorage.user;
+    }
+
+
+    while (!name || name.length < 2)
+    {
+        name = prompt('Please enter a name with at least two characters. You can set localStorage.user to use a default name in your session.');
+    }
+
+    return name;
+}
+
 function gameMovePlayerTo (player, x, y, direction)
 {
     console.log(logPrefix + 'gameMovePlayerTo', player, x, y);
@@ -321,7 +339,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('david'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('david__'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
@@ -329,8 +347,9 @@ game.socket.on('connect', function ()
     console.log(logPrefix + 'socket connected');
 
 
+
     var userData = {
-        name: 'TT'
+        name: getPlayerNameFromUser()
     };
 
     game.socket.emit(socketCommands.userConnect, userData);
