@@ -219,7 +219,7 @@ http.listen(server_port, function () {
 
 function buildCache() {
     var y = 0;
-    var mapWidth = map.tilesets[0].imagewidth;
+    var mapWidth = map.tilesets[0].columns;
 
     _.forEach(map.layers, function (layer) {
         for (var i = 0; i < layer.data.length; i++) {
@@ -228,13 +228,13 @@ function buildCache() {
                 var index = cache.collision.indexOf(i);
                 if (index == -1) {
                     var y = Math.floor(i / mapWidth);
-                    var x = mapWidth - y;
+                    var x = i - (mapWidth * y);
                     var location = {
                         x: x,
                         y: y
                     };
                     console.log(i, location, layer.data[i]);
-                    cache.collision.push(i);
+                    cache.collision.push(location);
                 }
             }
         }
