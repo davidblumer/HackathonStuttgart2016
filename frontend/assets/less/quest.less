@@ -1,0 +1,65 @@
+@import "variables.less";
+
+#questBottom
+{
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -300px;
+    margin-top: -300px;
+    width: 600px;
+    z-index: 13381338;
+    background: url(../images/parchent_bottom.png) no-repeat;
+    background-position: left bottom;
+    background-size: 100% auto;
+    padding-bottom: 179px;
+
+    #questBadge
+    {
+        position: absolute;
+        right: 50px;
+        bottom: -30px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        width: 78px;
+        height: 128px;
+
+        &.kaercher
+        {
+            background-image: url(../images/badges/kaercher_badge.png);
+        }
+
+        &.car2go
+        {
+            background-image: url(../images/badges/car2go_badge.png);
+        }
+    }
+
+    #questTop
+    {
+        background: url(../images/parchent_top.png) no-repeat;
+        background-position: left top;
+        background-size: 100% auto;
+        padding-top: 163px;
+
+        #quest
+        {
+            background: url(../images/parchent_mid.png);
+            background-position: left top;
+            background-repeat: repeat-y;
+            background-size: 100% 100%;
+            font-family: 'yoster_islandregular';
+            text-align: center;
+            overflow: hidden;
+            height: 300px;
+
+            .questContent
+            {
+                padding: 20px;
+            }
+
+        }
+
+    }
+}
