@@ -30,6 +30,27 @@ function capitalize(string)
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+function gameAddPlayer (user, x, y, id)
+{
+    console.log(logPrefix + 'gameAddPlayer', user, x, y, id);
+
+    if (id)
+    {
+        user.socketId   = id;
+    }
+
+    user.sprite.visible = true;
+    user.sprite.x       = x;
+    user.sprite.y       = y;
+}
+
+function gameAddPlayerFromSocketUser (user, socketUser)
+{
+    console.log(logPrefix + 'gameAddPlayerFromSocketUser', user, socketUser);
+
+    gameAddPlayer(user, socketUser.location.x, socketUser.location.y, socketUser.id);
+}
+
 /**
  *
  */
@@ -121,6 +142,31 @@ function gameInitPlayers ()
     }
 }
 
+function gameMovePlayerTo (player, x, y, direction)
+{
+    console.log(logPrefix + 'gameMovePlayerTo', player, x, y);
+
+    player.sprite.x = x;
+    player.sprite.y = y;
+
+    var animationName = null;
+
+    switch (direction)
+    {
+        case directions.down:  animationName = 'moveDown';  break;
+        case directions.left:  animationName = 'moveLeft';  break;
+        case directions.right: animationName = 'moveRight'; break;
+        case directions.up:    animationName = 'moveUp';    break;
+    }
+
+    player.sprite.animations.stop();
+
+    if (animationName)
+    {
+        player.sprite.animations.play(animationName);
+    }
+}
+
 /**
 *
 */
@@ -138,6 +184,12 @@ function gamePreload()
 
 
 
+}
+
+function gameRemovePlayer (player)
+{
+    player.socketId       = null;
+    player.sprite.visible = false;
 }
 
 /**
@@ -169,7 +221,6 @@ function gameUpdate()
 
         if (game.lastMovementSent == null || game.lastMovementSent + 25 < currentTime)
         {
-
             game.lastMovementSent = currentTime;
             game.socket.emit(socketCommands.userMovement, movementData);
         }
@@ -198,6 +249,10 @@ function getServerConnectionOptions ()
     };
 }
 
+/**
+ * @param socketUser
+ * @returns {*}
+ */
 function getUserForSocketUser (socketUser)
 {
     for (var i = 0; i < 4; ++i)
@@ -247,10 +302,7 @@ function reset ()
     {
         for (var i = 0; i < 4; ++i)
         {
-            var currentPlayer = game.player[i];
-
-            currentPlayer.socketId       = null;
-            currentPlayer.sprite.visible = false;
+            gameRemovePlayer(game.player[i]);
         }
     }
 }
@@ -298,25 +350,11 @@ game.socket.on('connect', function ()
 
         if (currentPlayer)
         {
-            currentPlayer.sprite.x = user.location.x;
-            currentPlayer.sprite.y = user.location.y;
-
-            var animationName = null;
-
-            switch (user.direction)
-            {
-                case directions.down:  animationName = 'moveDown';  break;
-                case directions.left:  animationName = 'moveLeft';  break;
-                case directions.right: animationName = 'moveRight'; break;
-                case directions.up:    animationName = 'moveUp';    break;
-            }
-
-            currentPlayer.sprite.animations.stop();
-
-            if (animationName)
-            {
-                currentPlayer.sprite.animations.play(animationName);
-            }
+            gameMovePlayerTo(currentPlayer, user.location.x, user.location.y, user.direction);
+        }
+        else
+        {
+            console.error(logPrefix + 'userLocationChange: no user found', user, currentPlayer, game.player);
         }
     });
 
@@ -347,10 +385,7 @@ game.socket.on('connect', function ()
 
             if (currentPlayer && currentPlayer.socketId == null)
             {
-                currentPlayer.socketId       = user.id;
-                currentPlayer.sprite.visible = true;
-                currentPlayer.sprite.x       = user.location.x;
-                currentPlayer.sprite.y       = user.location.y;
+                gameAddPlayerFromSocketUser(currentPlayer, user);
 
                 break;
             }
@@ -370,34 +405,27 @@ game.socket.on('connect', function ()
             {
                 var localUser = game.player[i];
 
-                if ((localUser && localUser.socketId == serverUser.id) || selfUserId == serverUser.id)
+                if (localUser && localUser.socketId == serverUser.id)
                 {
                     serverUserFound = true;
 
-                    if (localUser)
+                    if (selfUserId == serverUser.id)
                     {
-                        localUser.socketId       = serverUser.id;
-                        localUser.sprite.visible = true;
-                        localUser.sprite.x       = serverUser.location.x;
-                        localUser.sprite.y       = serverUser.location.y;
+                        gameAddPlayer(localUser, serverUser.location.x, serverUser.location.y, selfUserId);
                     }
                 }
+
             }
-console.log(serverUserFound);
+
             if (!serverUserFound)
             {
                 for (var i = 0; i < 4; ++i)
                 {
                     var localUser = game.player[i];
-                    console.log('test aa a', localUser, localUser.socketId == null);
+
                     if (localUser  && localUser.socketId == null)
                     {
-                        console.log('Tesfast', serverUser, localUser);
-
-                        localUser.socketId       = serverUser.id;
-                        localUser.sprite.visible = true;
-                        localUser.sprite.x       = serverUser.location.x;
-                        localUser.sprite.y       = serverUser.location.y;
+                        gameAddPlayerFromSocketUser(localUser, serverUser);
 
                         break;
                     }
