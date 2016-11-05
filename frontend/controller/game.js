@@ -21,6 +21,9 @@ var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
     chatMessage:        'chat.message',
+    questShowKaercher1: 'quest.show.kaercher1',
+    questShowKaercher2: 'quest.show.kaercher2',
+    questShowKaercher3: 'quest.show.kaercher3',
     mapLayout:          'map.layout',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
@@ -485,8 +488,26 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.userConnected, function(user)
     {
-       // TODO??
+        // TODO??
     });
+
+    game.socket.on(socketCommands.questShowKaercher1, function(user)
+    {
+        showKaercherWasserspender1();
+    });
+
+    game.socket.on(socketCommands.questShowKaercher2, function(user)
+    {
+        showKaercherWasserspender2();
+    });
+
+    game.socket.on(socketCommands.questShowKaercher3, function(user)
+    {
+        showKaercherWasserspender3();
+    });
+
+
+
 
     game.socket.on(socketCommands.userLeft, function(user)
     {
