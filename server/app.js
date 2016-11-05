@@ -50,6 +50,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+var doorLocked = true;
 var debug = false;
 var clients = [];
 var colors = ['green', 'blue', 'red', 'yellow', 'beige'];
@@ -186,8 +187,40 @@ var quests = [
             }
         ],
         user: null
+    },
+    {
+        data:  1,
+        event: 'quest.twoPlayer.unlock',
+        locations: [
+            {
+                x: 71,
+                y: 24
+            },
+            {
+                x: 71,
+                y: 25
+            }
+        ],
+        user: null
+    },
+    {
+        data:  2,
+        event: 'quest.twoPlayer.unlock',
+        locations: [
+            {
+                x: 73,
+                y: 24
+            },
+            {
+                x: 73,
+                y: 25
+            }
+        ],
+        user: null
     }
 ];
+
+
 
 /**
  * Map
@@ -216,10 +249,15 @@ function isMovementAllowed(location, direction) {
 
 
 
+
+
     var tile = {
         x: Math.floor(location.x / 16),
         y: Math.floor(location.y / 16)
     };
+
+
+
 
 
     if (direction == 'right')
@@ -231,6 +269,13 @@ function isMovementAllowed(location, direction) {
     {
         ++tile.y;
     }
+
+
+    if (tile.x == 72 && tile.y == 23 && doorLocked)
+    {
+        return false;
+    }
+
 
     var locationString = tile.x + '_' + tile.y;
 
@@ -363,6 +408,8 @@ io.on('connection', function (socket) {
 
                 var userIsInZone = false;
 
+                var numberOfDoorTriggerDown = 0;
+
                 for (var questKey in quests)
                 {
                     var currentQuest = quests[questKey];
@@ -384,10 +431,26 @@ io.on('connection', function (socket) {
                                 socket.emit(currentQuest.event, { data: currentQuest.data })
                             }
                         }
-
-
                     }
 
+
+
+                    if (currentQuest.event == 'quest.twoPlayer.unlock')
+                    {
+                        if (currentQuest.user != null)
+                        {
+                            ++numberOfDoorTriggerDown;
+                        }
+                    }
+                }
+
+                console.log('number of door triggers', numberOfDoorTriggerDown);
+
+                if (doorLocked && numberOfDoorTriggerDown >= 2)
+                {
+                    doorLocked = false;
+
+                    io.emit('quest.door.remove');
                 }
 
 

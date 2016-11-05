@@ -15,6 +15,8 @@ var game = null;
 
 var actionFunction = null;
 
+
+
 var presentationTimer = {
     lastAction: null,
     timer:      null
@@ -27,10 +29,12 @@ var logPrefix = 'HACKSTGT16: ';
 var socketCommands = {
     chatMessage:        'chat.message',
     collisionList:      'collision.list',
+    doorRemove:         'quest.door.remove',
     questShowText:      'quest.show.text',
     questShowKaercher:  'quest.show.kaercher',
     questCar2go:        'quest.show.car2go',
     mapLayout:          'map.layout',
+    twoPlayerUnlock:    'quest.twoPlayer.unlock',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
     userJoined:         'user.session.joined',
@@ -177,6 +181,19 @@ function gameInitPlayers ()
 
         game.player.push(newPlayer);
     }
+
+
+    // TODO: in funktion auslagern
+
+    game.keySprite = game.phaser.add.tileSprite(0, 0, 16, 16, 'players', 80);
+    game.keySprite.x = 46 * 16;
+    game.keySprite.y = 54 * 16;
+
+
+
+    game.doorSprite = game.phaser.add.tileSprite(0, 0, 16, 16, 'players', 79);
+    game.doorSprite.x = 72 * 16;
+    game.doorSprite.y = 23 * 16;
 }
 
 function getPlayerNameFromUser ()
@@ -386,6 +403,7 @@ function reset ()
     if (game == null)
     {
         game = {
+            door:      null,
             keys:    {
                 c:     null,
                 down:  null,
@@ -554,6 +572,26 @@ game.socket.on('connect', function ()
         if      (data.data == 1) actionFunction = showKaercherWasserspender1;
         else if (data.data == 2) actionFunction = showKaercherWasserspender2;
         else if (data.data == 3) actionFunction = showKaercherWasserspender3;
+    });
+
+
+    game.socket.on(socketCommands.doorRemove, function(data)
+    {
+        console.log(socketCommands.doorRemove, data);
+
+        var unlockSound    = $('#unlockSound')[0];
+        unlockSound.play();
+
+        game.doorSprite.visible = false;
+    });
+
+
+    game.socket.on(socketCommands.twoPlayerUnlock, function(data)
+    {
+        console.log(socketCommands.twoPlayerUnlock, data);
+
+        var starSound    = $('#starSound')[0];
+        starSound.play();
     });
 
 
