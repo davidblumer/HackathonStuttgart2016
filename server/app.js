@@ -129,8 +129,8 @@ function generateLocation() {
     //     y: Math.round(Math.random() * (map.tilesets[0].imageheight - 0) + 0)
     // };
     return {
-        x: 34,
-        y: 26
+        x: Math.floor(Math.random() * 42) + 34,
+        y: Math.floor(Math.random() * 27) + 26
     };
 }
 
