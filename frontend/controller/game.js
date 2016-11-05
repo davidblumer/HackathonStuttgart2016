@@ -29,8 +29,10 @@ var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
     userConnect:        'user.session.connect',
+    userConnected:      'user.session.connected',
     userJoined:         'user.session.joined',
     userLeft:           'user.session.left',
+    userList:           'user.list',
     userLocationChange: 'user.location.change',
     userMovement:       'user.movement'
 };
@@ -233,6 +235,12 @@ game.socket.on('connect', function ()
         }
     });
 
+
+    game.socket.on(socketCommands.userConnected, function(user)
+    {
+       // TODO??
+    });
+
     game.socket.on(socketCommands.userLeft, function(user)
     {
         var currentPlayer = getUserForSocketUser(user);
@@ -256,16 +264,55 @@ game.socket.on('connect', function ()
             {
                 currentPlayer.socketId       = user.id;
                 currentPlayer.sprite.visible = true;
+                currentPlayer.sprite.x       = user.location.x;
+                currentPlayer.sprite.y       = user.location.y;
 
                 break;
             }
         }
     });
 
+    game.socket.on(socketCommands.userList, function (selfUserId, serverUsers)
+    {
+        console.log(logPrefix + 'socket user list', selfUserId, serverUsers);
 
+        for (var serverUserKey in serverUsers)
+        {
+            var serverUser = serverUsers[serverUserKey];
+            var serverUserFound = false;
 
+            for (var i = 0; i < 4; ++i)
+            {
+                var localUser = game.player[i];
 
+                if (localUser.socketId == serverUser.id)
+                {
+                    serverUserFound = true;
+                }
+            }
 
+            if (!serverUserFound)
+            {
+                for (var i = 0; i < 4; ++i)
+                {
+                    var localUser = game.player[i];
+
+                    if (localUser.socketId == null)
+                    {
+                        console.log('Tesfast', serverUser, localUser);
+
+                        localUser.socketId       = serverUser.id;
+                        localUser.sprite.visible = true;
+                        localUser.sprite.x       = serverUser.location.x;
+                        localUser.sprite.y       = serverUser.location.y;
+
+                        break;
+                    }
+                }
+            }
+
+        }
+    });
 });
 
 game.socket.on('disconnect', function ()
