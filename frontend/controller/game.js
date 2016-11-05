@@ -260,6 +260,10 @@ function gameRender()
     // console.log(logPrefix + 'gameRender');
     // TODO
 
+
+
+    return;
+    
     var rect = new Phaser.Rectangle(0, 0, 16, 16);
     // console.log(rect);
     game.phaser.debug.geom( rect, '#0000ff' ) ;
