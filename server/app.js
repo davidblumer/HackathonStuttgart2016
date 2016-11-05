@@ -264,8 +264,8 @@ function generateLocation() {
     //     y: Math.round(Math.random() * (map.tilesets[0].imageheight - 0) + 0)
     // };
     return {
-        x: Math.floor(Math.random() * 42) + 34,
-        y: Math.floor(Math.random() * 27) + 26
+        x: (Math.random() * (42 - 34) + 34 ) *16,
+        y: (Math.random() * (27 - 26) + 26 ) *16
     };
 }
 
@@ -279,6 +279,8 @@ io.on('connection', function (socket) {
     socket.on('user.session.connect', function (data) {
 
         var newLocation = generateLocation();
+
+        console.log(newLocation);
 
         var user = {
             id: socket.id,
