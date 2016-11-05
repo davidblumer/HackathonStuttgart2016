@@ -24,6 +24,10 @@ var socketCommands = {
     questShowKaercher1: 'quest.show.kaercher1',
     questShowKaercher2: 'quest.show.kaercher2',
     questShowKaercher3: 'quest.show.kaercher3',
+    questCar2go1:       'quest.show.car2go1',
+    questCar2go2:       'quest.show.car2go2',
+    questCar2go3:       'quest.show.car2go3',
+    questCar2go4:       'quest.show.car2go4',
     mapLayout:          'map.layout',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
@@ -504,6 +508,26 @@ game.socket.on('connect', function ()
     game.socket.on(socketCommands.questShowKaercher3, function(user)
     {
         showKaercherWasserspender3();
+    });
+
+    game.socket.on(socketCommands.questCar2go1, function(user)
+    {
+        showCar2GoCar1();
+    });
+
+    game.socket.on(socketCommands.questCar2go2, function(user)
+    {
+        showCar2GoCar2();
+    });
+
+    game.socket.on(socketCommands.questCar2go3, function(user)
+    {
+        showCar2GoCar3();
+    });
+
+    game.socket.on(socketCommands.questCar2go4, function(user)
+    {
+        showCar2GoCar4();
     });
 
 
