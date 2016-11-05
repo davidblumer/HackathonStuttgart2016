@@ -499,6 +499,13 @@ game.socket.on('connect', function ()
 
             // TODO quit sound
         }
+
+        var options = {
+            content: user.name + ' left KärcheRPG',
+            timeout: 1337 * 2
+        };
+
+        $.snackbar(options);
     });
 
     game.socket.on(socketCommands.userJoined, function(user)
@@ -514,6 +521,13 @@ game.socket.on('connect', function ()
                 break;
             }
         }
+
+        var options = {
+            content: user.name + ' joined KärcheRPG',
+            timeout: 1337 * 2
+        };
+
+        $.snackbar(options);
     });
 
     /**
