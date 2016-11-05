@@ -30,6 +30,7 @@ var logPrefix = 'HACKSTGT16: ';
 var socketCommands = {
     userConnect:        'user.session.connect',
     userJoined:         'user.session.joined',
+    userLeft:           'user.session.left',
     userLocationChange: 'user.location.change',
     userMovement:       'user.movement'
 };
@@ -165,6 +166,21 @@ function getServerConnectionOptions ()
     };
 }
 
+function getUserForSocketUser (socketUser)
+{
+    for (var i = 0; i < 4; ++i)
+    {
+        var currentPlayer = game.player[i];
+
+        if (currentPlayer.socketId == socketUser.id)
+        {
+            return currentPlayer;
+        }
+    }
+
+    return false;
+}
+
 
 
 
@@ -191,47 +207,43 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.userLocationChange, function(user)
     {
+        var currentPlayer = getUserForSocketUser(user);
 
-        for (var i = 0; i < 4; ++i)
+        if (currentPlayer)
         {
-            var currentPlayer = game.player[i];
+            currentPlayer.sprite.x = user.location.x;
+            currentPlayer.sprite.y = user.location.y;
 
-            if (currentPlayer.socketId == user.id)
+            var animationName = null;
+
+            switch (user.direction)
             {
+                case directions.down:  animationName = 'moveDown';  break;
+                case directions.left:  animationName = 'moveLeft';  break;
+                case directions.right: animationName = 'moveRight'; break;
+                case directions.up:    animationName = 'moveUp';    break;
+            }
 
-                currentPlayer.sprite.x = user.location.x;
-                currentPlayer.sprite.y = user.location.y;
+            currentPlayer.sprite.animations.stop();
 
-
-
-                var animationName = null;
-
-                switch (user.direction)
-                {
-                    case directions.down:  animationName = 'moveDown';  break;
-                    case directions.left:  animationName = 'moveLeft';  break;
-                    case directions.right: animationName = 'moveRight'; break;
-                    case directions.up:    animationName = 'moveUp';    break;
-                }
-
-                currentPlayer.sprite.animations.stop();
-
-                if (animationName)
-                {
-                    currentPlayer.sprite.animations.play(animationName);
-                }
-
-
-                break;
+            if (animationName)
+            {
+                currentPlayer.sprite.animations.play(animationName);
             }
         }
+    });
 
+    game.socket.on(socketCommands.userLeft, function(user)
+    {
+        var currentPlayer = getUserForSocketUser(user);
 
+        if (currentPlayer)
+        {
+            currentPlayer.socketId       = null;
+            currentPlayer.sprite.visible = false;
 
-
-
-
-
+            // TODO quit sound
+        }
     });
 
     game.socket.on(socketCommands.userJoined, function(user)
@@ -260,6 +272,7 @@ game.socket.on('disconnect', function ()
 {
     console.log(logPrefix + 'socket disconnected');
 
+    // TODO alles resetten
 
 });
 
