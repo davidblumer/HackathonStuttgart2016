@@ -26,6 +26,7 @@
   "dependencies": {
     "phaser": "^2.6.2",
     "bootstrap": "^3.3.7",
-    "loglevel": "^1.4.1"
+    "loglevel": "^1.4.1",
+    "snackbarjs": "^1.1.0"
   }
 }

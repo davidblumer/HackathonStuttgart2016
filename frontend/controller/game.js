@@ -15,6 +15,7 @@ var game = null;
 var logPrefix = 'HACKSTGT16: ';
 
 var socketCommands = {
+    chatMessage:        'chat.message',
     mapLayout:          'map.layout',
     userConnect:        'user.session.connect',
     userConnected:      'user.session.connected',
@@ -25,14 +26,24 @@ var socketCommands = {
     userMovement:       'user.movement'
 };
 
+/**
+ * @param string
+ * @returns {string}
+ */
 function capitalize(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+/**
+ * @param user
+ * @param x
+ * @param y
+ * @param id
+ */
 function gameAddPlayer (user, x, y, id)
 {
-    console.log(logPrefix + 'gameAddPlayer', user, x, y, id);
+    // console.log(logPrefix + 'gameAddPlayer', user, x, y, id);
 
     if (id)
     {
@@ -44,9 +55,13 @@ function gameAddPlayer (user, x, y, id)
     user.sprite.y       = y;
 }
 
+/**
+ * @param user
+ * @param socketUser
+ */
 function gameAddPlayerFromSocketUser (user, socketUser)
 {
-    console.log(logPrefix + 'gameAddPlayerFromSocketUser', user, socketUser);
+    // console.log(logPrefix + 'gameAddPlayerFromSocketUser', user, socketUser);
 
     gameAddPlayer(user, socketUser.location.x, socketUser.location.y, socketUser.id);
 }
@@ -97,6 +112,7 @@ function gameCreate()
 
 function gameInitKeys ()
 {
+    game.keys.c     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.C);
     game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -243,6 +259,11 @@ function gameUpdate()
             game.socket.emit(socketCommands.userMovement, movementData);
         }
     }
+
+    if (game.keys.c.isDown)
+    {
+        sendChatMessage();
+    }
 }
 
 /**
@@ -294,6 +315,7 @@ function reset ()
     {
         game = {
             keys:    {
+                c:     null,
                 down:  null,
                 left:  null,
                 right: null,
@@ -330,6 +352,16 @@ function reset ()
 }
 
 
+function sendChatMessage ()
+{
+    var chatMessage = prompt('What do you want to say?');
+
+    if (chatMessage)
+    {
+        game.socket.emit(socketCommands.chatMessage, { text: chatMessage });
+    }
+
+}
 
 
 localStorage.debug = '*fsaf';
@@ -339,7 +371,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('david__'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('david'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
@@ -413,6 +445,23 @@ game.socket.on('connect', function ()
                 break;
             }
         }
+    });
+
+    /**
+     *
+     */
+    game.socket.on(socketCommands.chatMessage, function(user, message)
+    {
+        // console.log(logPrefix + 'chat message', user, message);
+
+        var finalMessage = user.name + ': ' + message.text;
+
+        var options = {
+            content: finalMessage,
+            timeout: 1337 * 2
+        };
+
+        $.snackbar(options);
     });
 
     game.socket.on(socketCommands.userList, function (selfUserId, serverUsers)
