@@ -157,6 +157,9 @@ io.on('connection', function (socket) {
      * User-movement
      */
     socket.on('user.movement', function (data) {
+
+        var moveSpeed = 2 + (data.shift ? 4 : 0);
+
         var user = _.find(clients, ['id', socket.id]);
         var newLocation = user.location;
 
@@ -165,22 +168,22 @@ io.on('connection', function (socket) {
         if (user && now > user.lastMovement + 25 || user && !user.lastMovement) {
             if (data.left) {
                 //  console.log('Movement detected: ', socket.id, ' ►');
-                --newLocation.x;
+                newLocation.x -= moveSpeed;
                 user.direction = 'left';
             }
             if (data.right) {
                 //   console.log('Movement detected: ', socket.id, ' ◄');
-                ++newLocation.x;
+                newLocation.x += moveSpeed;
                 user.direction = 'right';
             }
             if (data.up) {
                 //  console.log('Movement detected: ', socket.id, ' ▲');
-                --newLocation.y;
+                newLocation.y -= moveSpeed;
                 user.direction = 'up';
             }
             if (data.down) {
                 //   console.log('Movement detected: ', socket.id, ' ▼');
-                ++newLocation.y;
+                newLocation.y += moveSpeed;
                 user.direction = 'down';
             }
 
