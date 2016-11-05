@@ -424,7 +424,7 @@ io.on('connection', function (socket) {
                         {
                             console.log('GDSGSS', currentQuest);
 
-                            if (currentQuest.user == null)
+                            if (currentQuest.user == null && (doorLocked || currentQuest.event != 'quest.twoPlayer.unlock'))
                             {
                                 userIsInZone = true;
 
