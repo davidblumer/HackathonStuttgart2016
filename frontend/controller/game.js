@@ -397,7 +397,7 @@ function getServerAddress (target)
 {
     if (target == 'josh')  return '192.168.43.166:1338';
     if (target == 'david') return '192.168.2.120:1338';
-    if (target == 'thomas') return '192.168.2.140:1338';
+    if (target == 'thomas') return '192.168.1.114:1338';
 
     return 'localhost:1338';
 }
