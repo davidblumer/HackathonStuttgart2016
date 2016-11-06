@@ -367,7 +367,7 @@ function gameUpdate()
         {
             chatMessageDebouncer.message1 = currentTime;
 
-            sendChatMessage('Can you please refill the water dispenser next to the coffee machine?');
+            sendChatMessage('The charge level of the sweeper is ok!');
         }
     }
 
@@ -379,7 +379,7 @@ function gameUpdate()
         {
             chatMessageDebouncer.message2 = currentTime;
 
-            sendChatMessage('Yea, for sure!');
+            sendChatMessage('Alright Josh, thank you.');
         }
     }
 }
@@ -663,7 +663,7 @@ game.socket.on('connect', function ()
 
         var options = {
             content: user.name + ' left KärcheRPG',
-            timeout: 1337 * 2
+            timeout: 1337 * 3
         };
 
         $.snackbar(options);
