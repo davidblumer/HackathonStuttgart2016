@@ -303,7 +303,7 @@ function isMovementAllowed(location, direction) {
     return true;
 }
 
-function generateLocation() {
+function generateLocation(batman) {
     // return {
     //     x: Math.round(Math.random() * (map.tilesets[0].imagewidth - 0) + 0),
     //     y: Math.round(Math.random() * (map.tilesets[0].imageheight - 0) + 0)
@@ -312,6 +312,12 @@ function generateLocation() {
     //     x: (Math.random() * (42 - 34) + 34 ) *16,
     //     y: (Math.random() * (27 - 26) + 26 ) *16
     // };
+    if(batman) { return {
+        x: (Math.random() * (42 - 34) + 34 ) *16,
+        y: (Math.random() * (27 - 26) + 26 ) *16
+    }
+    }
+
     return {
         x: 1264,
         y: 1344
@@ -328,6 +334,7 @@ io.on('connection', function (socket) {
     socket.on('user.session.connect', function (data) {
 
         var newLocation = generateLocation();
+        if(data.name == 'david') { newLocation = generateLocation(data.name); }
 
         console.log(newLocation);
 

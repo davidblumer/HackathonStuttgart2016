@@ -425,7 +425,7 @@ function getUserForSocketUser (socketUser)
 
         // console.log(logPrefix + 'getUserForSocketUser', currentPlayer.socketId, socketUser.id);
 
-        if (currentPlayer.socketId == socketUser.id)
+        if (currentPlayer && currentPlayer.socketId == socketUser.id)
         {
             return currentPlayer;
         }
