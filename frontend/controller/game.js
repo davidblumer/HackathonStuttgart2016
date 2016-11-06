@@ -543,7 +543,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('davidf'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('josh'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
