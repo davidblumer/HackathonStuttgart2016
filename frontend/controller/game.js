@@ -15,7 +15,10 @@ var game = null;
 
 var actionFunction = null;
 
-
+var chatMessageDebouncer = {
+    message1: null,
+    message2: null
+};
 
 var presentationTimer = {
     lastAction: null,
@@ -130,6 +133,8 @@ function gameCreate()
 
 function gameInitKeys ()
 {
+    game.keys.o     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.O);
+    game.keys.p     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.P);
     game.keys.c     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.C);
     game.keys.t     = game.phaser.input.keyboard.addKey(Phaser.Keyboard.T);
     game.keys.space = game.phaser.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -137,7 +142,7 @@ function gameInitKeys ()
     game.keys.up    = game.phaser.input.keyboard.addKey(Phaser.Keyboard.UP);
     game.keys.down  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.keys.left  = game.phaser.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-    game.keys.right = game.phaser.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+    game.keys.pight = game.phaser.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 }
 
 function gameInitLayers ()
@@ -283,7 +288,7 @@ function gameRender()
 
     var rect = new Phaser.Rectangle(0, 0, 16, 16);
     // console.log(rect);
-    game.phaser.debug.geom( rect, '#0000ff' ) ;
+    game.phaser.debug.geom( rect, '353531' ) ;
 
     game.phaser.debug.text( "This is debug text", 10, 10 );
 
@@ -312,14 +317,15 @@ function gameUpdate()
     var movementData = {
         down:  game.keys.down.isDown,
         left:  game.keys.left.isDown,
-        right: game.keys.right.isDown,
+        right: game.keys.pight.isDown,
         shift: game.keys.shift.isDown,
         up:    game.keys.up.isDown
     };
 
+    var currentTime = getCurrentTime();
+
     if (movementData.down || movementData.left || movementData.right || movementData.up)
     {
-        var currentTime = getCurrentTime();
 
         if (game.lastMovementSent == null || game.lastMovementSent + 25 < currentTime)
         {
@@ -342,10 +348,38 @@ function gameUpdate()
     {
         console.log('action function', actionFunction);
 
-        if (actionFunction)
+        var quest = $('#quest');
+
+        if (quest.hasClass('visible'))
         {
+            console.log('quest opened');
+            quest.click();
+        } else if (actionFunction) {
+            console.log('quest closed');
             actionFunction();
             actionFunction = null;
+        }
+    }
+
+    if (game.keys.p.isDown)
+    {
+        if (chatMessageDebouncer.message1 == null || chatMessageDebouncer.message1 + 1000 < currentTime)
+        {
+            chatMessageDebouncer.message1 = currentTime;
+
+            sendChatMessage('Can you please refill the water dispenser next to the coffee machine?');
+        }
+    }
+
+
+
+    if (game.keys.o.isDown)
+    {
+        if (chatMessageDebouncer.message2 == null || chatMessageDebouncer.message2 + 1000 < currentTime)
+        {
+            chatMessageDebouncer.message2 = currentTime;
+
+            sendChatMessage('Yea, for sure!');
         }
     }
 }
@@ -437,10 +471,12 @@ function reset ()
 }
 
 
-function sendChatMessage ()
+function sendChatMessage (chatMessage)
 {
-    var chatMessage = prompt('What do you want to say?');
-
+    if (!chatMessage)
+    {
+        chatMessage = prompt('What do you want to say?');
+    }
     if (chatMessage)
     {
         game.socket.emit(socketCommands.chatMessage, { text: chatMessage });
@@ -504,7 +540,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('david__'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('davidf'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
