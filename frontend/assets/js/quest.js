@@ -11,7 +11,10 @@ function showQuest (content, badge)
         questBadge.addClass(badge);
     }
 
-    $('#quest').addClass('visible').animate({ height: 300 }, 250);
+    $('#quest').animate({ height: 300 }, 250, function()
+    {
+        $(this).addClass('visible');
+    });
     $('#questBottom').fadeIn(250);
 }
 
