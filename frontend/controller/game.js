@@ -515,7 +515,7 @@ function updateTimer ()
     --presentationTimer.timeout;
 
 
-    var minutes = Math.floor(presentationTimer.timeout / 60);
+    var minutes = '0' + Math.floor(presentationTimer.timeout / 60);
     var seconds = presentationTimer.timeout - (minutes * 60);
 
     $('#timer').text('Presentation time left: ' + minutes + ':' + seconds);
