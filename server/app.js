@@ -496,7 +496,7 @@ io.on('connection', function (socket) {
     });
     socket.on('disconnect', function () {
         var user = _.find(clients, ['id', socket.id]);
-        if(user.name){
+        if(user && user.name){
             console.log('User disconnected ', user.name);
         }
 

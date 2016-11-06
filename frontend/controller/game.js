@@ -98,7 +98,7 @@ function gameCreate()
 
     game.phaser.physics.startSystem(Phaser.Physics.ARCADE);
 
-    game.phaser.stage.backgroundColor = '#FF0000';
+    game.phaser.stage.backgroundColor = '#404040';
 
     game.map = game.phaser.add.tilemap('map');
 
@@ -301,7 +301,7 @@ function gameRender()
 
             var rect = new Phaser.Rectangle(parseInt(splitted[0], 10) * 16, parseInt(splitted[1], 10) * 16, 16, 16);
            // console.log(rect);
-            game.phaser.debug.geom( rect, '#ff0000' ) ;
+            game.phaser.debug.geom( rect, '#353531' ) ;
 
         }
     }
@@ -397,6 +397,7 @@ function getServerAddress (target)
 {
     if (target == 'josh')  return '192.168.43.166:1338';
     if (target == 'david') return '192.168.2.120:1338';
+    if (target == 'thomas') return '192.168.2.140:1338';
 
     return 'localhost:1338';
 }
@@ -543,7 +544,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('josh'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('thomas'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
@@ -581,7 +582,7 @@ game.socket.on('connect', function ()
         }
         else
         {
-            console.error(logPrefix + 'userLocationChange: no user found', user, currentPlayer, game.player);
+            // console.error(logPrefix + 'userLocationChange: no user found', user, currentPlayer, game.player);
         }
     });
 
