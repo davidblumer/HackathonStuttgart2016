@@ -308,9 +308,13 @@ function generateLocation() {
     //     x: Math.round(Math.random() * (map.tilesets[0].imagewidth - 0) + 0),
     //     y: Math.round(Math.random() * (map.tilesets[0].imageheight - 0) + 0)
     // };
+    // return {
+    //     x: (Math.random() * (42 - 34) + 34 ) *16,
+    //     y: (Math.random() * (27 - 26) + 26 ) *16
+    // };
     return {
-        x: (Math.random() * (42 - 34) + 34 ) *16,
-        y: (Math.random() * (27 - 26) + 26 ) *16
+        x: 1264,
+        y: 1344
     };
 }
 
