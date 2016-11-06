@@ -422,8 +422,6 @@ io.on('connection', function (socket) {
 
                         if (currentQuestLocation.x == tile.x && currentQuestLocation.y == tile.y)
                         {
-                            console.log('GDSGSS', currentQuest);
-
                             if (currentQuest.user == null && (doorLocked || currentQuest.event != 'quest.twoPlayer.unlock'))
                             {
                                 userIsInZone = true;
@@ -445,8 +443,6 @@ io.on('connection', function (socket) {
                         }
                     }
                 }
-
-                console.log('number of door triggers', numberOfDoorTriggerDown);
 
                 if (doorLocked && numberOfDoorTriggerDown >= 2)
                 {
@@ -500,10 +496,13 @@ io.on('connection', function (socket) {
     });
     socket.on('disconnect', function () {
         var user = _.find(clients, ['id', socket.id]);
+        if(user.name){
+            console.log('User disconnected ', user.name);
+        }
+
 
         var index = clients.indexOf(user);
         if (index > -1) {
-            console.log('User disconnected ', user.name);
             io.emit('user.session.left', user);
             clients.splice(index, 1);
         }
@@ -562,5 +561,3 @@ function buildCache() {
 }
 
 buildCache();
-
-console.log('Test', isMovementAllowed({ x: 55, y: 172 } ));
