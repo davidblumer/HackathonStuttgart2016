@@ -500,11 +500,11 @@ io.on('connection', function (socket) {
     });
     socket.on('disconnect', function () {
         var user = _.find(clients, ['id', socket.id]);
-        console.log('User disconnected ', user.name);
-        io.emit('user.session.left', user);
 
         var index = clients.indexOf(user);
         if (index > -1) {
+            console.log('User disconnected ', user.name);
+            io.emit('user.session.left', user);
             clients.splice(index, 1);
         }
     });
