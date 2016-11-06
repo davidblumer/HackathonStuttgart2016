@@ -155,7 +155,7 @@ function gameInitLayers ()
         {
             var layerName = capitalize(key);
 
-            console.log(layerName);
+            // console.log(layerName);
 
             currentLayer = game.map.createLayer(layerName);
 
@@ -221,7 +221,7 @@ function getPlayerNameFromUser ()
 
 function gameMovePlayerTo (player, x, y, direction, followCamera)
 {
-    console.log(logPrefix + 'gameMovePlayerTo', player, x, y);
+    // console.log(logPrefix + 'gameMovePlayerTo', player, x, y);
 
     player.sprite.x = x;
     player.sprite.y = y;
@@ -254,7 +254,7 @@ function gameMovePlayerTo (player, x, y, direction, followCamera)
 */
 function gamePreload()
 {
-    console.log(logPrefix + 'gamePreload');
+    // console.log(logPrefix + 'gamePreload');
 
     //game.phaser.load.tilemap('map', 'data/map.json', null, Phaser.Tilemap.TILED_JSON);
     game.phaser.load.tilemap('map', null, game.tileData, Phaser.Tilemap.TILED_JSON);
@@ -346,16 +346,16 @@ function gameUpdate()
 
     if (game.keys.space.isDown)
     {
-        console.log('action function', actionFunction);
+        // console.log('action function', actionFunction);
 
         var quest = $('#quest');
 
         if (quest.hasClass('visible'))
         {
-            console.log('quest opened');
+            // console.log('quest opened');
             quest.click();
         } else if (actionFunction) {
-            console.log('quest closed');
+            // console.log('quest closed');
             actionFunction();
             actionFunction = null;
         }
@@ -395,7 +395,7 @@ function getCurrentTime ()
  */
 function getServerAddress (target)
 {
-    if (target == 'josh')  return '192.168.2.135:1338';
+    if (target == 'josh')  return '192.168.43.166:1338';
     if (target == 'david') return '192.168.2.120:1338';
 
     return 'localhost:1338';
@@ -422,7 +422,7 @@ function getUserForSocketUser (socketUser)
     {
         var currentPlayer = game.player[i];
 
-        console.log(logPrefix + 'getUserForSocketUser', currentPlayer.socketId, socketUser.id);
+        // console.log(logPrefix + 'getUserForSocketUser', currentPlayer.socketId, socketUser.id);
 
         if (currentPlayer.socketId == socketUser.id)
         {
@@ -486,7 +486,7 @@ function sendChatMessage (chatMessage)
 
 function toggleTimer ()
 {
-    console.log(logPrefix + 'toggleTimer');
+    // console.log(logPrefix + 'toggleTimer');
 
     var currentTime = getCurrentTime();
 
@@ -548,7 +548,7 @@ game.socket = io.connect(getServerAddress('josh'), getServerConnectionOptions())
 
 game.socket.on('connect', function ()
 {
-    console.log(logPrefix + 'socket connected');
+    // console.log(logPrefix + 'socket connected');
 
 
 
@@ -573,7 +573,7 @@ game.socket.on('connect', function ()
     {
         var currentPlayer = getUserForSocketUser(user);
 
-        console.log(logPrefix + 'userLocationChange', user, currentPlayer);
+        // console.log(logPrefix + 'userLocationChange', user, currentPlayer);
 
         if (currentPlayer)
         {
@@ -593,21 +593,21 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.collisionList, function(data)
     {
-        console.log('collision list', data);
+        // console.log('collision list', data);
 
         collisionDebug = data;
     });
 
     game.socket.on(socketCommands.questShowText, function(data)
     {
-        console.log(socketCommands.questShowText, data);
+        // console.log(socketCommands.questShowText, data);
 
         if (data.data == 1) actionFunction = showTechStack;
     });
 
     game.socket.on(socketCommands.questShowKaercher, function(data)
     {
-        console.log(socketCommands.questShowKaercher, data);
+        // console.log(socketCommands.questShowKaercher, data);
 
         if      (data.data == 1) actionFunction = showKaercherWasserspender1;
         else if (data.data == 2) actionFunction = showKaercherWasserspender2;
@@ -617,7 +617,7 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.doorRemove, function(data)
     {
-        console.log(socketCommands.doorRemove, data);
+        // console.log(socketCommands.doorRemove, data);
 
         var unlockSound    = $('#unlockSound')[0];
         unlockSound.play();
@@ -628,7 +628,7 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.twoPlayerUnlock, function(data)
     {
-        console.log(socketCommands.twoPlayerUnlock, data);
+        // console.log(socketCommands.twoPlayerUnlock, data);
 
         var starSound    = $('#starSound')[0];
         starSound.play();
@@ -639,7 +639,7 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.questCar2go, function(data)
     {
-        console.log(socketCommands.questCar2go, data);
+        // console.log(socketCommands.questCar2go, data);
 
         if      (data.data == 1) actionFunction = showCar2GoCar1;
         else if (data.data == 2) actionFunction = showCar2GoCar2;
@@ -695,7 +695,7 @@ game.socket.on('connect', function ()
      */
     game.socket.on(socketCommands.chatMessage, function(user, message)
     {
-        console.log(logPrefix + 'chat message', user, message);
+        // console.log(logPrefix + 'chat message', user, message);
 
         var finalMessage = user.name + ': ' + message.text;
 
@@ -709,7 +709,7 @@ game.socket.on('connect', function ()
 
     game.socket.on(socketCommands.userList, function (selfUserId, serverUsers)
     {
-        console.log(logPrefix + 'socket user list', selfUserId, serverUsers);
+        // console.log(logPrefix + 'socket user list', selfUserId, serverUsers);
 
         for (var serverUserKey in serverUsers)
         {
@@ -752,14 +752,14 @@ game.socket.on('connect', function ()
 
 game.socket.on('disconnect', function ()
 {
-    console.log(logPrefix + 'socket disconnected');
+    // console.log(logPrefix + 'socket disconnected');
 
     reset();
 });
 
 game.socket.on('error', function()
 {
-    console.log(logPrefix + 'socket error');
+    // console.log(logPrefix + 'socket error');
 
 
 });
