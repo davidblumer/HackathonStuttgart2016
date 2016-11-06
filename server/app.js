@@ -283,7 +283,7 @@ function isMovementAllowed(location, direction) {
 
     var isForbidden = cache.forbiddenTiles.indexOf(locationString) > -1;
 
-    console.log(location, tile, direction, locationString, isForbidden);
+    // console.log(location, tile, direction, locationString, isForbidden);
 
     if (isForbidden) {
         return false;
@@ -538,7 +538,7 @@ function buildCache() {
             var locationString = x + '_' + y;
             var isForbidden = terrainId > 0 && forbiddenTerrain.indexOf(terrainId) > -1;
 
-            console.log('Tile cache:', terrainId, locationString, isForbidden);
+            // console.log('Tile cache:', terrainId, locationString, isForbidden);
 
 
             if (isForbidden) {
