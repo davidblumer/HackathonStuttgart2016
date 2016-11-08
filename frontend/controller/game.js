@@ -397,7 +397,7 @@ function getServerAddress (target)
 {
     if (target == 'josh')  return '192.168.43.166:1338';
     if (target == 'david') return '192.168.2.120:1338';
-    if (target == 'thomas') return '192.168.1.114:1338';
+    if (target == 'thomas') return '192.168.3.109:1338';
 
     return 'localhost:1338';
 }
@@ -544,7 +544,7 @@ localStorage.debug = '*fsaf';
 
 reset();
 
-game.socket = io.connect(getServerAddress('thomas'), getServerConnectionOptions());
+game.socket = io.connect(getServerAddress('thomas__'), getServerConnectionOptions());
 
 
 game.socket.on('connect', function ()
@@ -685,7 +685,7 @@ game.socket.on('connect', function ()
 
         var options = {
             content: user.name + ' joined KärcheRPG',
-            timeout: 1337 * 2
+            timeout: 1337 * 4
         };
 
         $.snackbar(options);
